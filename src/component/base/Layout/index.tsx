@@ -1,4 +1,6 @@
 import { notoSansJP } from '@/style/fonts';
+import Header from '../Header';
+import Footer from '../Footer';
 
 // NOTE: トップレベルのclassNameで使うフォントを設定する必要があります
 export default function Layout({
@@ -8,7 +10,11 @@ export default function Layout({
 }>) {
   return (
     <html lang='ja' className='h-full'>
-      <body className={`h-full ${notoSansJP.variable}`}>{children}</body>
+      <body className={`h-full ${notoSansJP.variable} flex flex-col`}>
+        <Header />
+        <main className='flex-grow'>{children}</main>
+        <Footer />
+      </body>
     </html>
   );
 }

@@ -1,3 +1,8 @@
+/* NOTE: layout.tsxは名前の通り、レイアウトやメタデータを定義するためのものです。
+  総てのpage.tsxはlayout.tsxに内部でラップされます。
+  また、`app`配下以外のディレクトリにも配置でき、その場合は、そのディレクトリより下の階層のpage.tsxがラップされます。
+*/
+
 import type { Metadata } from 'next';
 import './globals.css';
 import Layout from '@/component/base/Layout';
