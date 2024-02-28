@@ -12,7 +12,6 @@
 
 - `React`
 - `Next.js(App Router)` : Reactフレームワーク
-- `Radix`: UIコンポーネント
 - `TailwindCSS`: CSSフレームワーク
 - `NextAuth`: 認証情報管理
 - `React-Hook-Form`: Formヘルパー
