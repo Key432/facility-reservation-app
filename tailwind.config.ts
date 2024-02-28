@@ -6,7 +6,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        // NOTE: className="text-noto"と指定することでNoto Sansを指定できるようになります。
+        // NOTE: className="font-noto"と指定することでNoto Sansを指定できるようになります。
         noto: [
           'var(--font-noto-sans)',
           'Arial',
