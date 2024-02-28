@@ -1,0 +1,55 @@
+{
+  // 保存時のフォーマット
+  "editor.formatOnSave": true,
+  // 保存時のESLint --fix
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always"
+  },
+  "editor.quickSuggestions": {
+    "other": "on",
+    "comments": "off",
+    // Tailwindcssのclass補完を早くする
+    "strings": "on"
+  },
+  // 使用するフォーマッターの設定
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "[typescriptreact]": {},
+  "[typescript]": {},
+  "[jsonc]": {},
+  "[javascript]": {},
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features",
+    "editor.formatOnSave": false
+  },
+  "[ejs]": {
+    "editor.formatOnSave": false
+  },
+
+  // 拡張機能TODO Treeの設定
+  "todo-tree.general.tags": ["TODO", "FIXME", "HACK", "NOTE"],
+  "todo-tree.highlights.defaultHighlight": {
+    "gutterIcon": true
+  },
+  "todo-tree.highlights.customHighlight": {
+    "TODO": {
+      "icon": "check-circle-fill",
+      "foreground": "#ffa500",
+      "iconColour": "#ffa500"
+    },
+    "FIXME": {
+      "icon": "flame",
+      "foreground": "#ff4500",
+      "iconColour": "#ff4500"
+    },
+    "HACK": {
+      "icon": "project-symlink",
+      "foreground": "#008000",
+      "iconColour": "#008000"
+    },
+    "NOTE": {
+      "icon": "paintbrush",
+      "foreground": "#00bfff",
+      "iconColour": "#00bfff"
+    }
+  }
+}
