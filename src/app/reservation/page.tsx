@@ -1,4 +1,4 @@
-import Menu from '@/component/page/Menu';
+import Menu from '@/components/pages/Menu';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {

@@ -1,7 +1,7 @@
 // NOTE: onSubmitはユーザーの操作によって発火するイベントなのでサーバーサイドでは使えません。"use client"を指定します。
 'use client';
 
-import Button from '@/component/ui/Button';
+import Button from '@/components/ui/Button';
 // NOTE: React-Hook-Formは主流のフォームヘルパーライブラリです。詳しい使い方は公式ドキュメントを参照してください。
 // https://react-hook-form.com/
 import { useForm } from 'react-hook-form';

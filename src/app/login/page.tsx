@@ -1,4 +1,4 @@
-import Login from '@/component/page/Login';
+import Login from '@/components/pages/Login';
 import { Metadata } from 'next';
 
 // NOTE: app/layout.tsxのmetadataで`title.template`を設定している場合、配下のメタデータでタイトルを指定するとtemplateの`%s`に代入されます

@@ -5,7 +5,11 @@ export default function Footer() {
     <footer className='bg-[#33CCBB]'>
       <div className='container mx-auto flex w-full items-center justify-between'>
         {/* NOTE: v14のnext/Linkはそれ以前と仕様が変わっているので注意 */}
-        <Link href='/' className='py-4 text-lg'>
+        <Link
+          href='https://github.com/Key432/facility-reservation-app'
+          target='_blank'
+          className='py-4 text-lg'
+        >
           GitHub
         </Link>
       </div>
