@@ -19,6 +19,9 @@ export type FacilityData = {
   created_at: string;
 };
 
+// クッキーを読み込みなおすため、サーバーでデータをキャッシュせず、強制的にレンダリングしなおさせる設定
+export const dynamic = 'force-dynamic';
+
 export async function accessFacility() {
   const supabase = createServerComponentClient<Database>({ cookies });
   const { data: facilityList } = await supabase
