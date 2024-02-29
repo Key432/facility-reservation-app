@@ -4,6 +4,7 @@
 import { Database } from '@/lib/supabase/database.types';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
+import { cache } from 'react';
 
 export type FacilityList = {
   facility_id: number;
@@ -19,8 +20,13 @@ export type FacilityData = {
   created_at: string;
 };
 
+export const createServerSupabaseClient = cache(() => {
+  const cookieStore = cookies();
+  return createServerComponentClient<Database>({ cookies: () => cookieStore });
+});
+
 export async function accessFacility() {
-  const supabase = createServerComponentClient<Database>({ cookies });
+  const supabase = createServerSupabaseClient();
   const { data: facilityList } = await supabase
     .from('facility')
     .select('facility_id, name')

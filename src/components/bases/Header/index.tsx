@@ -3,12 +3,15 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { Database } from '@/lib/supabase/database.types';
 import LogOut from '@/features/Auth/component/LogOut';
+import { cache } from 'react';
 
-// クッキーを読み込みなおすため、サーバーでデータをキャッシュせず、強制的にレンダリングしなおさせる設定
-export const dynamic = 'force-dynamic';
+export const createServerSupabaseClient = cache(() => {
+  const cookieStore = cookies();
+  return createServerComponentClient<Database>({ cookies: () => cookieStore });
+});
 
 export default async function Header() {
-  const supabase = createServerComponentClient<Database>({ cookies });
+  const supabase = createServerSupabaseClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
