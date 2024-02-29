@@ -12,6 +12,10 @@ export default function Footer() {
         >
           GitHub
         </Link>
+        <div>
+          <p>Contributor: Shimizu</p>
+          <p>Deployed at 2024/03/01 ver0.9</p>
+        </div>
       </div>
     </footer>
   );
