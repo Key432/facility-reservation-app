@@ -1,10 +1,18 @@
 // NOTE: onSubmitはユーザーの操作によって発火するイベントなのでサーバーサイドでは使えません。"use client"を指定します。
 'use client';
 
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
+import { Database } from '@/lib/supabase/database.types';
+
 import Button from '@/components/ui/Button';
+import Link from 'next/link';
 // NOTE: React-Hook-Formは主流のフォームヘルパーライブラリです。詳しい使い方は公式ドキュメントを参照してください。
 // https://react-hook-form.com/
 import { useForm } from 'react-hook-form';
+
+// NOTE:  クライアントコンポーネントでリダイレクトなどを行うためのHooksです。
+// ネットで検索すると同名の`useRouter`を`next/router`から読み込んでいるものがありますが、Page Routerのものです。
+import { useRouter } from 'next/navigation';
 
 export type LoginForm = {
   email: string;
@@ -15,6 +23,11 @@ const emailPattern =
   /^[a-zA-Z0-9_.+-]+@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/;
 
 export default function LoginForm() {
+  // supabaseを操作するクライアントの作成
+  const supabase = createClientComponentClient<Database>();
+  // ルーティング操作を行うHooksであるuseRouterからインスタンスを取得
+  const router = useRouter();
+
   const {
     register,
     handleSubmit,
@@ -23,8 +36,26 @@ export default function LoginForm() {
 
   // formのサブミットボタンを押下されるとhandleSbumitに渡したこのonSubmitが実行される。
   // フォームのデータは引数としてわたってくる
-  const onSubmit = (data: LoginForm) => {
-    console.log(data);
+  const onSubmit = async ({ email, password }: LoginForm) => {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) throw error;
+      /*
+        NOTE: ログインに成功した場合は画面をリフレッシュする。
+        リフレッシュするとmiddlewareの処理が走り
+        「ログイン済み状態でログイン画面にいる場合は予約メニューにリダイレクト」が実行される
+        router.push()を使うとリダイレクトをここで行えるが、全体を覆っているLayoutのサーバーサイドコンポーネントである
+        Headerが再読み込みされず、ログイン済み状態でも「予約メニュー・ログアウト」ボタンが表示されなかったのでこの方法にしている
+      */
+      router.refresh();
+    } catch (error) {
+      console.error(error);
+      alert('サインインに失敗しました');
+    }
   };
 
   /* NOTE: Reactにおけるフォームの作り方はしっかり調べるとややこしいです。
@@ -60,8 +91,8 @@ export default function LoginForm() {
             */}
             <input
               {...register('email', { pattern: emailPattern, required: true })}
-              className='ml-2 rounded-md border border-gray-400 py-2'
-              placeholder='test@example.com'
+              className='ml-2 rounded-md border border-gray-400 p-2'
+              placeholder='email@example.com'
             />
           </label>
           {/*
@@ -76,10 +107,10 @@ export default function LoginForm() {
         </div>
         <div className='mb-4'>
           <label>
-            メールアドレス*
+            パスワード*
             <input
               {...register('password', { required: true })}
-              className='ml-2 rounded-md border border-gray-400 py-2'
+              className='ml-2 rounded-md border border-gray-400 p-2'
               type='password'
               placeholder='password'
             />
@@ -93,6 +124,12 @@ export default function LoginForm() {
           className='w-full rounded-md bg-[#FF99D6] py-2 hover:bg-[#FF0099]'
         />
       </form>
+      <p className='mt-4'>
+        会員登録がまだですか？{' '}
+        <Link href='/signup' className='underline hover:text-[#FF0099]'>
+          サインアップ
+        </Link>
+      </p>
     </div>
   );
 }
