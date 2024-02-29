@@ -1,29 +1,32 @@
 import Link from 'next/link';
+import PageLayout from '@/components/bases/PageLayout';
 
+/*
+  NOTE: カスタムコンポーネントで囲った場合、子要素はカスタムコンポーネントの`children`という属性に渡されます
+*/
 export default function Menu() {
   return (
-    <div className='flex h-full flex-col text-center'>
-      <h1 className='my-20 text-6xl font-extrabold'>予約メニュー</h1>
-      <div className='container mx-auto mt-10 flex flex-grow flex-col items-center justify-center bg-gray-100'>
+    <PageLayout title='予約メニュー'>
+      <div className='flex h-full flex-grow flex-col items-center justify-center'>
         <Link
-          href='/'
+          href='/reservation/register'
           className='my-10 rounded-md  bg-[#FF99D6] px-20 py-4 hover:bg-[#FF0099]'
         >
           予約登録
         </Link>
         <Link
-          href='/'
+          href='/reservation/list'
           className='my-10 rounded-md  bg-[#FF99D6] px-20 py-4 hover:bg-[#FF0099]'
         >
           予約確認
         </Link>
         <Link
-          href='/'
+          href='/reservation/facilities'
           className='my-10 rounded-md  bg-[#FF99D6] px-20 py-4 hover:bg-[#FF0099]'
         >
           施設一覧
         </Link>
       </div>
-    </div>
+    </PageLayout>
   );
 }
