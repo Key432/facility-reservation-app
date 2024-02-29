@@ -12,3 +12,6 @@ bin/
 obj/
 out/
 .next/
+
+# db schema
+database.types.ts
