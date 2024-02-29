@@ -5,7 +5,7 @@
 
 import type { Metadata } from 'next';
 import './globals.css';
-import Layout from '@/components/bases/Layout';
+import Layout from '@/components/bases/RootLayout';
 
 // NOTE: `title.template`を用いることで簡単にページごとの<title>を設定できます
 // メタデータは`metadata.tsx`で切り出すことも可能です。
