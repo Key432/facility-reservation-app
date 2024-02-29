@@ -17,7 +17,7 @@ export default async function Header() {
   } = await supabase.auth.getUser();
 
   return (
-    <header className='bg-[#33CCBB]'>
+    <header className='bg-[#33CCBB] px-4'>
       <div className='container mx-auto flex h-full w-full items-center justify-between'>
         <Link href='/'>
           <p className='font-noto py-4 text-lg font-bold'>設備予約デモ</p>

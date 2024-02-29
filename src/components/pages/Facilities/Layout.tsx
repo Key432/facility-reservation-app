@@ -10,7 +10,7 @@ export default async function FacilityLayout({
 
   return (
     <div className='flex h-full justify-start'>
-      <div className='h-full w-1/12 bg-gray-200 pl-4'>
+      <div className='h-full w-1/6 bg-gray-200 pl-4'>
         <ul className='pt-10'>
           {/* 
             この書き方は「オプショナルチェーン（data?.map()）」と「Null合体演算子（??）」を一緒に使っています

@@ -16,34 +16,40 @@ export default async function FacilityDetail({ facility_id }: { facility_id: num
   if (!facility) notFound();
 
   return (
-    <div className='container mx-auto h-full pt-16'>
-      <h1 className='inline text-6xl font-extrabold'>{facility.name}</h1>
-      <p className='ml-4 inline'>収容人数: {facility.capacity}</p>
-      <p className='pt-4'>※画像・施設説明文はすべてChatGPTが生成したものです。</p>
-      <div className='flex w-full justify-between pt-10'>
-        <div className='w-3/4'>
-          <p>{facility?.description ?? '説明がありません'}</p>
-        </div>
-        <div className='flex w-full justify-center'>
-          {/*
+    <div className='container mx-auto h-full pt-6'>
+      <div className='justify-betweeen mb-6 md:flex'>
+        {/*
             NOTE: next/imageのImageコンポーネントは画像の配信を最適化するコンポーネントです。
             画像の大きさやキャッシュを最適化してくれます。大きさの指定などに癖があるので確認してください。
           */}
-          <Image
-            src={facility?.picture_url ?? picture}
-            alt='施設写真'
-            height={400}
-            width={400}
-            className='block'
-          />
+        <Image
+          src={facility?.picture_url ?? picture}
+          alt='施設写真'
+          height={300}
+          width={300}
+          className='m-6 mt-0'
+        />
+        <div className='px-4'>
+          <div className='items-center justify-between lg:flex'>
+            <div>
+              <h1 className='inline text-6xl font-extrabold'>{facility.name}</h1>
+              <p className='ml-4 inline'>収容人数: {facility.capacity}</p>
+            </div>
+            <div className='mt-4'>
+              <Link
+                href={`/reservation/register?id=${facility.facility_id}`}
+                className='rounded-md bg-[#FF99D6] px-10 py-4 hover:bg-[#FF0099]'
+              >
+                この施設を予約する
+              </Link>
+            </div>
+          </div>
+          <p className='pt-4'>※画像・施設説明文はすべてChatGPTが生成したものです。</p>
+          <div className='flex w-full justify-between pt-6'>
+            <p>{facility?.description ?? '説明がありません'}</p>
+          </div>
         </div>
       </div>
-      <Link
-        href={`/reservation/register?id=${facility.facility_id}`}
-        className='rounded-md  bg-[#FF99D6] px-20 py-4 hover:bg-[#FF0099]'
-      >
-        この施設を予約する
-      </Link>
     </div>
   );
 }

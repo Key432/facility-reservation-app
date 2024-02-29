@@ -47,7 +47,7 @@ export default function SignUpForm() {
       // 会員登録が成功したら予約メニューに遷移
       if (data.session) router.push('/reservation');
     } catch (error) {
-      console.log(error);
+      console.error(error);
       alert('登録に失敗しました');
     }
   };

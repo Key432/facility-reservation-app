@@ -16,10 +16,8 @@ export default function LogOut() {
   const router = useRouter();
 
   const handleLogOut = async () => {
-    console.log('test');
     try {
       const { error } = await supabase.auth.signOut();
-      console.log(error);
       if (error) throw error;
       // 画面を再読み込みする
       // NOTE: 画面を再読み込みすると、middlewareの処理が走る。
