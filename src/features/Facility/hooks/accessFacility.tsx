@@ -27,6 +27,7 @@ export const createServerSupabaseClient = cache(() => {
 
 export async function accessFacility() {
   const supabase = createServerSupabaseClient();
+
   const { data: facilityList } = await supabase
     .from('facility')
     .select('facility_id, name')

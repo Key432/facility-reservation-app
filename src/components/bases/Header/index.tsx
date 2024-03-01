@@ -1,29 +1,19 @@
 import Link from 'next/link';
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
-import { cookies } from 'next/headers';
-import { Database } from '@/lib/supabase/database.types';
 import LogOut from '@/features/Auth/component/LogOut';
-import { cache } from 'react';
 
-export const createServerSupabaseClient = cache(() => {
-  const cookieStore = cookies();
-  return createServerComponentClient<Database>({ cookies: () => cookieStore });
-});
+import { hasSession } from '@/features/Auth/hooks/authSession';
 
 export default async function Header() {
-  const supabase = createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const loggedIn = await hasSession();
 
   return (
     <header className='bg-[#33CCBB] px-4'>
       <div className='container mx-auto flex h-full w-full items-center justify-between'>
         <Link href='/'>
-          <p className='font-noto py-4 text-lg font-bold'>設備予約デモ</p>
+          <p className='py-4 font-noto text-lg font-bold'>設備予約デモ</p>
         </Link>
         {/* NOTE: v14からLinkは内部に<a>タグをラップするようになったのでh-fullでも背景が上下に伸びません。flexで対応しています */}
-        {user ? (
+        {loggedIn ? (
           <div className='flex h-full items-center '>
             <Link
               href='/reservation'
