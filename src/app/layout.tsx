@@ -1,6 +1,15 @@
-/* NOTE: layout.tsxは名前の通り、レイアウトやメタデータを定義するためのものです。
-  総てのpage.tsxはlayout.tsxに内部でラップされます。
+/*
+  NOTE: layout.tsxは名前の通り、レイアウトやメタデータを定義するためのものです。
+  すべてのpage.tsxはlayout.tsxに内部でラップされます。
   また、`app`配下以外のディレクトリにも配置でき、その場合は、そのディレクトリより下の階層のpage.tsxがラップされます。
+  https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts#layouts
+*/
+/*
+  NOTE: layout.tsxと似た役割のファイルにtemplate.tsxがあります。
+  どちらも配置されているディレクトリ配下のpage.tsxをラップして配置します。
+  違いは、layout.tsxはページを最初に表示したときにレンダリングし、それ以降ページを遷移をしても再レンダリングされません。
+  template.tsxは画面を遷移するたびにレンダリングされます。
+  https://nextjs.org/docs/app/api-reference/file-conventions/template
 */
 
 import type { Metadata } from 'next';
@@ -8,7 +17,7 @@ import './globals.css';
 import Layout from '@/components/bases/RootLayout';
 
 // NOTE: `title.template`を用いることで簡単にページごとの<title>を設定できます
-// メタデータは`metadata.tsx`で切り出すことも可能です。
+// メタデータは`metadata.ts`で切り出したり動的に生成することも可能です。
 export const metadata: Metadata = {
   title: {
     template: '%s | 設備予約デモ',
