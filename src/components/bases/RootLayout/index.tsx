@@ -12,7 +12,7 @@ export default function Layout({
     <html lang='ja' className='h-full'>
       <body className={`h-full ${notoSansJP.variable} flex flex-col`}>
         <Header />
-        <main className='flex-grow'>{children}</main>
+        <main className='my-16 h-full'>{children}</main>
         <Footer />
       </body>
     </html>

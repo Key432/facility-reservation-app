@@ -14,7 +14,7 @@ import AuthStateWrapper from '@/features/Auth/component/AuthStateWrapper';
 
 export default function Header() {
   return (
-    <header className='bg-[#33CCBB] px-4'>
+    <header className='fixed top-0 h-16 w-full bg-[#33CCBB] px-4'>
       <div className='container mx-auto flex h-full w-full items-center justify-between'>
         <Link href='/'>
           <p className='font-noto py-4 text-lg font-bold'>設備予約デモ</p>

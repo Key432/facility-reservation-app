@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function Footer() {
   return (
-    <footer className='bg-[#33CCBB] px-4'>
+    <footer className='fixed bottom-0 h-16 w-full bg-[#33CCBB] px-4'>
       <div className='container mx-auto flex w-full items-center justify-between'>
         {/* NOTE: v14のnext/Linkはそれ以前と仕様が変わっているので注意 */}
         <Link
@@ -13,7 +13,7 @@ export default function Footer() {
           GitHub
         </Link>
         <div>
-          <p>Contributor: Shimizu</p>
+          <p>Developer: Shimizu</p>
           <p>Deployed at 2024/03/01 ver0.9</p>
         </div>
       </div>
