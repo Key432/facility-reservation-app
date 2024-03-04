@@ -6,28 +6,6 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { cache } from 'react';
 
-export type FacilityList = {
-  facility_id: number;
-  name: string;
-};
-
-export type FacilityData = {
-  facility_id: number;
-  name: string;
-  capacity: string | null;
-  description: string | null;
-  picture_url: string | null;
-  created_at: string;
-  furniture:
-    | {
-        furniture_id: number;
-        facility_id: number;
-        name: string;
-        created_at: string;
-      }[]
-    | null;
-};
-
 export const createServerSupabaseClient = cache(() => {
   const cookieStore = cookies();
   return createServerComponentClient<Database>({ cookies: () => cookieStore });
