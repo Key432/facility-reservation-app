@@ -18,6 +18,14 @@ export type FacilityData = {
   description: string | null;
   picture_url: string | null;
   created_at: string;
+  furniture:
+    | {
+        furniture_id: number;
+        facility_id: number;
+        name: string;
+        created_at: string;
+      }[]
+    | null;
 };
 
 export const createServerSupabaseClient = cache(() => {
@@ -25,23 +33,15 @@ export const createServerSupabaseClient = cache(() => {
   return createServerComponentClient<Database>({ cookies: () => cookieStore });
 });
 
-export async function accessFacility() {
+export async function fetchFacilityData(
+  facility_id: number,
+): Promise<FacilityData | null> {
   const supabase = createServerSupabaseClient();
-
-  const { data: facilityList } = await supabase
+  const { data } = await supabase
     .from('facility')
-    .select('facility_id, name')
-    .order('facility_id');
+    .select('*, furniture(*)')
+    .eq('facility_id', facility_id)
+    .single();
 
-  const fetchFacility = async (facility_id: number): Promise<FacilityData | null> => {
-    const { data } = await supabase
-      .from('facility')
-      .select('*')
-      .eq('facility_id', facility_id)
-      .single();
-
-    return data as FacilityData | null;
-  };
-
-  return { facilityList, fetchFacility };
+  return data;
 }

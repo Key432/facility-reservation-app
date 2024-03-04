@@ -1,13 +1,12 @@
-import { accessFacility } from '@/features/Facility/hooks/accessFacility';
 import { notFound } from 'next/navigation';
 
 // NOTE: 画像が設定されていないとき用の静的画像ファイルです。イメージデータなどもこのように直接importできます
 import noImage from './noimage.drawio.png';
 import Image from 'next/image';
+import { fetchFacilityData } from '@/features/Facility/hooks/getServerFacility';
 
 export default async function FacilityDetail({ facility_id }: { facility_id: number }) {
-  const { fetchFacility } = await accessFacility();
-  const facility = await fetchFacility(facility_id);
+  const facility = await fetchFacilityData(facility_id);
 
   // facilityがnullのとき=facility_idが無かったときなのでnotFound画面に飛ばす
   // NOTE: `notFouond()`は任意の時に404ページに遷移させる関数。
