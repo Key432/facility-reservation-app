@@ -10,7 +10,10 @@ export function useFacility() {
 
   useEffect(() => {
     const fetchFacilityData = async () => {
-      const { data } = await supabase.from('facility').select('*, furniture(*)');
+      const { data } = await supabase
+        .from('facility')
+        .select('*, furniture(*)')
+        .order('facility_id');
 
       setFacilities(data ?? []);
     };

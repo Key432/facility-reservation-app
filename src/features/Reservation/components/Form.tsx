@@ -2,6 +2,11 @@
 
 import Button from '@/components/ui/Button';
 import { useFacility } from '@/features/Facility/hooks/useFacility';
+/*
+  NOTE: `useSearchParams`はClient ComponentでURLQueryを取得するためのHooksです。
+  <url>?hoge=""の結果を`.get()`や`.getAll()`で受け取れます
+*/
+import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 
 type ReservationItem = {
@@ -13,13 +18,20 @@ type ReservationItem = {
 
 export default function ReservationForm() {
   const { facilities } = useFacility();
+  const searchParams = useSearchParams();
+  const defaultParam = searchParams.get('facility_id');
+  const defaultSelected = !isNaN(Number(defaultParam)) ? Number(defaultParam) : undefined;
 
   const {
     handleSubmit,
     register,
     watch,
     formState: { errors },
-  } = useForm<ReservationItem>();
+  } = useForm<ReservationItem>({
+    defaultValues: {
+      facility_id: defaultSelected,
+    },
+  });
 
   const selectedFurniture = facilities.find((faclity) => {
     return faclity.facility_id === Number(watch('facility_id'));
@@ -44,11 +56,17 @@ export default function ReservationForm() {
                 必須項目です
               </p>
             </div>
+            {/* 
+              NOTE: Reactでは<option>タグの`selected`属性が使えません。
+              FIXME: defaultValueが効かない
+            */}
             <select
               id='facility_id'
               {...register('facility_id', { required: true })}
+              defaultValue={defaultSelected}
               className='w-full rounded-md border border-gray-400 p-2'
             >
+              <option value={undefined}>選択してください</option>
               {facilities.map((facility) => {
                 const { facility_id, name } = facility;
                 return (
@@ -84,7 +102,7 @@ export default function ReservationForm() {
           </div>
           <div className='mb-2'>
             <div className='flex justify-between'>
-              <label className='block' htmlFor='password'>
+              <label className='block' htmlFor='reservation_date'>
                 予約日*
               </label>
               <p
