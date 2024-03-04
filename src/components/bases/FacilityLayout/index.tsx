@@ -8,7 +8,7 @@ export default function FacilityLayout({ children }: { children: React.ReactNode
       <div className='md:flex-grow'>{children}</div>
       <div className='border-r-2 md:w-1/6'>
         <List
-          href='/reservation/facilities'
+          href='/facilities'
           ulClassName='bg-gray-100'
           liClassName='pl-2 py-4 hover:bg-gray-200'
         />

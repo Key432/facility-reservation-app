@@ -18,17 +18,17 @@ export default function Header() {
       <div className='container mx-auto flex h-full w-full items-center justify-between'>
         <div className='px-4'>
           <Link href='/'>
-            <p className='font-noto py-4 text-lg font-bold'>設備予約デモ</p>
+            <p className='py-4 font-noto text-lg font-bold'>設備予約デモ</p>
           </Link>
         </div>
         {/* AuthStateWrapperはログインしているかどうかで表示・非表示を変える。showWhenLoggedInがtrueの時はログイン中にだけ表示するコンテンツ */}
         <AuthStateWrapper showWhenLoggedIn={true}>
           <div className='flex h-full items-center '>
             <Link
-              href='/reservation'
+              href='/menu'
               className='flex h-full items-center bg-[#FF99D6] px-4 font-bold hover:bg-[#FF0099]'
             >
-              予約ページ
+              予約メニュー
             </Link>
             <LogOut logoutSuccessRedirect='/login'>
               <div className='flex h-full cursor-pointer items-center bg-[#FF99D6] px-4 font-bold hover:bg-[#FF0099]'>
