@@ -7,6 +7,7 @@ import { useFacility } from '@/features/Facility/hooks/useFacility';
   <url>?hoge=""の結果を`.get()`や`.getAll()`で受け取れます
 */
 import { useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
 type ReservationItem = {
@@ -17,25 +18,48 @@ type ReservationItem = {
 };
 
 export default function ReservationForm() {
-  const { facilities } = useFacility();
+  const { facilities, isLoading } = useFacility();
   const searchParams = useSearchParams();
-  const defaultParam = searchParams.get('facility_id');
-  const defaultSelected = !isNaN(Number(defaultParam)) ? Number(defaultParam) : undefined;
+  const defaultSelected = Number(searchParams.get('facility_id') || '');
 
   const {
     handleSubmit,
     register,
     watch,
+    setError,
+    clearErrors,
     formState: { errors },
   } = useForm<ReservationItem>({
     defaultValues: {
-      facility_id: defaultSelected,
+      facility_id: defaultSelected || undefined,
     },
   });
 
-  const selectedFurniture = facilities.find((faclity) => {
-    return faclity.facility_id === Number(watch('facility_id'));
-  })?.furniture;
+  // NOTE: `watch()`はRHFのよく使う関数です。現在フォームに入力されている値を監視することができます
+  const selectedFurniture =
+    facilities
+      .find((facility) => facility.facility_id === Number(watch('facility_id')))
+      ?.furniture?.map((furniture) => ({
+        name: furniture.name,
+        furniture_id: furniture.furniture_id,
+      })) ?? [];
+
+  /*
+    NOTE: 予約日に日付が入力された際に、その日付が今日以降かを確認する
+    useEffectの依存配列に`reservationDate`をわたし、この値が変更されるたびに実行されるようにします。
+    useEffectを使わない場合、今日以前の日付を選んだ瞬間に無限レンダリングが発生します
+    NOTE: `setError()`はRHFのよく使う関数で、任意のタイミングでバリデーションエラーを発生させることができます。
+    ただし、WGではzodを使っていたのでzodのresolverを使った方がよいかと思います
+    TODO: zodを使ってバリデーションを実装する
+  */
+  const reservationDate = watch('reservation_date');
+  useEffect(() => {
+    if (new Date(reservationDate) <= new Date()) {
+      setError('reservation_date', { message: '今日以降の日付を選択してください' });
+    } else {
+      clearErrors('reservation_date');
+    }
+  }, [clearErrors, reservationDate, setError]);
 
   const onSubmit = (data: ReservationItem) => {
     console.log(data);
@@ -44,44 +68,45 @@ export default function ReservationForm() {
   return (
     <div className='min-w-96 rounded-lg border border-gray-400 p-8'>
       <div className='text-left'>
-        <form onSubmit={(event) => void handleSubmit(onSubmit)(event)}>
-          <div className='mb-2'>
-            <div className='flex justify-between'>
-              <label className='block' htmlFor='facility_id'>
-                予約する設備*
-              </label>
-              <p
-                className={`text-red-600 ${errors.facility_id ? 'visible' : 'invisible'}`}
+        {/* 
+          NOTE: 設備一覧が取得できるまではフォームを表示しない。
+          こうしないと、設備が<option>にわたるまえに<select>がレンダリングされてしまい、defaultValueが機能しない
+        */}
+        {!isLoading && (
+          <form onSubmit={(event) => void handleSubmit(onSubmit)(event)}>
+            <div className='mb-2'>
+              <div className='flex justify-between'>
+                <label className='block' htmlFor='facility_id'>
+                  予約する設備*
+                </label>
+                <p className='text-red-600'>
+                  {errors.facility_id && errors.facility_id.message}
+                </p>
+              </div>
+              {/* 
+                NOTE: Reactでは<option>のselected属性は使えない。
+                代わりに<select>タグのdefaultValue属性を使用する。
+              */}
+              <select
+                id='facility_id'
+                {...register('facility_id', {
+                  required: '必須項目です',
+                })}
+                defaultValue={defaultSelected || ''}
+                className='w-full rounded-md border border-gray-400 p-2'
               >
-                必須項目です
-              </p>
-            </div>
-            {/* 
-              NOTE: Reactでは<option>タグの`selected`属性が使えません。
-              FIXME: defaultValueが効かない
-            */}
-            <select
-              id='facility_id'
-              {...register('facility_id', { required: true })}
-              defaultValue={defaultSelected}
-              className='w-full rounded-md border border-gray-400 p-2'
-            >
-              <option value={undefined}>選択してください</option>
-              {facilities.map((facility) => {
-                const { facility_id, name } = facility;
-                return (
+                <option value=''>選択してください</option>
+                {facilities.map(({ facility_id, name }) => (
                   <option key={facility_id} value={facility_id}>
                     {name}
                   </option>
-                );
-              })}
-            </select>
-          </div>
-          <div className='mb-4'>
-            <p>使用什器</p>
-            <div className='h-20 overflow-y-auto rounded-lg border border-gray-400'>
-              {selectedFurniture?.map((furniture) => {
-                return (
+                ))}
+              </select>
+            </div>
+            <div className='mb-4'>
+              <p>使用什器</p>
+              <div className='h-20 overflow-y-auto rounded-lg border border-gray-400 py-2'>
+                {selectedFurniture.map((furniture) => (
                   <label
                     className='ml-2 block'
                     htmlFor={`furniture${furniture.furniture_id}`}
@@ -96,47 +121,41 @@ export default function ReservationForm() {
                     />
                     {furniture.name}
                   </label>
-                );
-              })}
+                ))}
+              </div>
             </div>
-          </div>
-          <div className='mb-2'>
-            <div className='flex justify-between'>
-              <label className='block' htmlFor='reservation_date'>
-                予約日*
+            <div className='mb-2'>
+              <div className='flex justify-between'>
+                <label className='block' htmlFor='reservation_date'>
+                  予約日*
+                </label>
+                <p className='text-red-600'>
+                  {errors.reservation_date && errors.reservation_date.message}
+                </p>
+              </div>
+              <input
+                id='reservation_date'
+                {...register('reservation_date', { required: '必須項目です' })}
+                className='w-full rounded-md border border-gray-400 p-2'
+                type='date'
+              />
+            </div>
+            <div className='mb-4'>
+              <label className='block' htmlFor='remark'>
+                備考
               </label>
-              <p
-                className={`text-red-600 ${errors.reservation_date ? 'visible' : 'invisible'}`}
-              >
-                必須項目です
-              </p>
+              <textarea
+                id='remark'
+                {...register('remark')}
+                className='w-full rounded-md border border-gray-400 p-2'
+              />
             </div>
-            <input
-              id='reservation_date'
-              {...register('reservation_date', { required: true })}
-              className='w-full rounded-md border border-gray-400 p-2'
-              type='date'
+            <Button
+              label='予約'
+              className='w-full rounded-md bg-[#FF99D6] py-2 hover:bg-[#FF0099]'
             />
-          </div>
-          <div className='mb-4'>
-            <label className='block' htmlFor='remark'>
-              備考
-            </label>
-            {/* 
-              NOTE: Reactの`<textarea>`の指定方法はプレーンHTMLの書き方
-              `<textarea></textarea>`と異なります
-            */}
-            <textarea
-              id='remark'
-              {...register('remark', { required: true })}
-              className='w-full rounded-md border border-gray-400 p-2'
-            />
-          </div>
-          <Button
-            label='予約'
-            className='w-full rounded-md bg-[#FF99D6] py-2 hover:bg-[#FF0099]'
-          />
-        </form>
+          </form>
+        )}
       </div>
     </div>
   );
