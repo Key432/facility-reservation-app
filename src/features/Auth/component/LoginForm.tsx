@@ -1,4 +1,6 @@
 // NOTE: onSubmitはユーザーの操作によって発火するイベントなのでサーバーサイドでは使えません。"use client"を指定します。
+// ちなみに、"use client"はReactの現行v18で実験的実装で、次期v19で正式実装予定のものをNext.jsが先んじて実装したものです。
+// そのためReactの時期バージョンアップでもしかすると仕様が変わるかもしれません。
 'use client';
 
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
@@ -22,10 +24,13 @@ export type LoginForm = {
 const emailPattern =
   /^[a-zA-Z0-9_.+-]+@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/;
 
-export default function LoginForm() {
+export default function LoginForm({
+  loginSuccessRedirect = undefined,
+}: {
+  loginSuccessRedirect?: string;
+}) {
   // supabaseを操作するクライアントの作成
   const supabase = createClientComponentClient<Database>();
-  // ルーティング操作を行うHooksであるuseRouterからインスタンスを取得
   const router = useRouter();
 
   const {
@@ -44,21 +49,17 @@ export default function LoginForm() {
       });
 
       if (error) throw error;
-      /*
-        NOTE: ログインに成功した場合は画面をリフレッシュする。
-        リフレッシュするとmiddlewareの処理が走り
-        「ログイン済み状態でログイン画面にいる場合は予約メニューにリダイレクト」が実行される
-        router.push()を使うとリダイレクトをここで行えるが、全体を覆っているLayoutのサーバーサイドコンポーネントである
-        Headerが再読み込みされず、ログイン済み状態でも「予約メニュー・ログアウト」ボタンが表示されなかったのでこの方法にしている
-      */
-      router.refresh();
+
+      // propsで渡されたページに遷移する
+      if (loginSuccessRedirect) router.push(loginSuccessRedirect);
     } catch (error) {
       console.error(error);
       alert('サインインに失敗しました');
     }
   };
 
-  /* NOTE: Reactにおけるフォームの作り方はしっかり調べるとややこしいです。
+  /* 
+    NOTE: Reactにおけるフォームの作り方はしっかり調べるとややこしいです。
     ReactのフォームにはControled、Uncontroledという概念があります。
     ざっくりstateで管理するかrefで管理するかという違いがあります。
     これはUI Componentライブラリを使う場合などに問題になることがあります
@@ -67,12 +68,17 @@ export default function LoginForm() {
   */
   return (
     <div className='rounded-lg border border-gray-400 p-8'>
-      {/* NOTE: 公式ドキュメントではこうしていないはずだが、こうしないと動かなかったりSubmitによるリロードが走る。要検証。*/}
-      <form onSubmit={(event) => void handleSubmit(onSubmit)(event)}>
-        <div className='mb-4'>
-          <label>
-            メールアドレス*
-            {/*
+      {/*
+        NOTE: `onSubmit={handleSubmit(onSubmit)}`では動かず、こうやって無名関数でラップしないとエラーになる。
+        同事例報告あり：https://stackoverflow.com/questions/74190256/eslint-promise-returning-function-provided-to-attribute-where-a-void-return-was
+      */}
+      <div className='text-left'>
+        <form onSubmit={(event) => void handleSubmit(onSubmit)(event)}>
+          <div className='mb-2'>
+            {/* NOTE: htmlのfor属性はJSの予約語と衝突するのでhtmlForとなります */}
+            <label className='block' htmlFor='email'>
+              メールアドレス*
+              {/*
               NOTE: JSXのなかでは{}で囲むことで式を書くことができます。変数などを表示させるときに{}で括るのはこのためです。
               ここで`...register()`の`...`はスプレッド構文というものです。
               https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Operators/Spread_syntax
@@ -89,41 +95,38 @@ export default function LoginForm() {
               ```
               と書くのと同じことです。子コンポーネントにまとめてpropsを渡すとき便利です。
             */}
+            </label>
             <input
+              id='email'
               {...register('email', { pattern: emailPattern, required: true })}
-              className='ml-2 rounded-md border border-gray-400 p-2'
+              className='w-full rounded-md border border-gray-400 p-2'
               placeholder='email@example.com'
             />
-          </label>
-          {/*
-            NOTE: この書き方はJavaScriptの短絡評価を利用しています。
-            JSでは""（空文字）や`0`、`null`などはfalsyな値となります。エラーの時は文字列がわたりtruthyになるので<p>タグがレンダリングされます。
-            RHFではエラーがない場合は`undefined`となるため使えますが、数値などがわたる場合は0が描画されてしまうので三項演算子をつかうことをお勧めします。
-            https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Operators/Logical_AND
-          */}
-          {errors.email && (
-            <p className='text-red-600'>正しい形式のメールアドレスを入力してください</p>
-          )}
-        </div>
-        <div className='mb-4'>
-          <label>
-            パスワード*
+            <p className={`text-red-600 ${errors.email ? 'visible' : 'invisible'}`}>
+              正しい形式のメールアドレスを入力してください
+            </p>
+          </div>
+          <div className='mb-4'>
+            <label className='block' htmlFor='password'>
+              パスワード*
+            </label>
             <input
+              id='password'
               {...register('password', { required: true })}
-              className='ml-2 rounded-md border border-gray-400 p-2'
+              className='w-full rounded-md border border-gray-400 p-2'
               type='password'
               placeholder='password'
             />
-          </label>
-          {errors.password && (
-            <p className='text-red-600'>パスワードを入力してください</p>
-          )}
-        </div>
-        <Button
-          label='ログイン'
-          className='w-full rounded-md bg-[#FF99D6] py-2 hover:bg-[#FF0099]'
-        />
-      </form>
+            <p className={`text-red-600 ${errors.password ? 'visible' : 'invisible'}`}>
+              パスワードを入力してください
+            </p>
+          </div>
+          <Button
+            label='ログイン'
+            className='w-full rounded-md bg-[#FF99D6] py-2 hover:bg-[#FF0099]'
+          />
+        </form>
+      </div>
       <p className='mt-4'>
         会員登録がまだですか？{' '}
         <Link href='/signup' className='underline hover:text-[#FF0099]'>

@@ -1,3 +1,6 @@
+// サーバーでのセッション認証を行うため、サーバーでの使用を強制する
+'use server';
+
 import { Database } from '@/lib/supabase/database.types';
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
@@ -8,10 +11,15 @@ export const createServerSupabaseClient = cache(() => {
   return createServerComponentClient<Database>({ cookies: () => cookieStore });
 });
 
-export async function hasSession() {
+export async function fetchFacilityData(
+  facility_id: number,
+): Promise<FacilityData | null> {
   const supabase = createServerSupabaseClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  return user !== null;
+  const { data } = await supabase
+    .from('facility')
+    .select('*, furniture(*)')
+    .eq('facility_id', facility_id)
+    .single();
+
+  return data;
 }
