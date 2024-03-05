@@ -2,6 +2,8 @@
 
 import Button from '@/components/ui/Button';
 import { useFacility } from '@/features/Facility/hooks/useFacility';
+import { ReservationInsertParams, useReservation } from '../hooks/useReservation';
+
 /*
   NOTE: `useSearchParams`はClient ComponentでURLQueryを取得するためのHooksです。
   <url>?hoge=""の結果を`.get()`や`.getAll()`で受け取れます
@@ -19,8 +21,10 @@ type ReservationItem = {
 
 export default function ReservationForm() {
   const { facilities, isLoading } = useFacility();
+  const { isReserved, reserveFacility } = useReservation();
   const searchParams = useSearchParams();
-  const defaultSelected = Number(searchParams.get('facility_id') || '');
+  const defaultSelected = Number(searchParams.getAll('facility_id') || '');
+  const defaultDate = searchParams.getAll('reservation_date')[0] ?? '';
 
   const {
     handleSubmit,
@@ -28,6 +32,7 @@ export default function ReservationForm() {
     watch,
     setError,
     clearErrors,
+    reset,
     formState: { errors },
   } = useForm<ReservationItem>({
     defaultValues: {
@@ -53,16 +58,34 @@ export default function ReservationForm() {
     TODO: zodを使ってバリデーションを実装する
   */
   const reservationDate = watch('reservation_date');
+  const facilityId = watch('facility_id');
   useEffect(() => {
     if (new Date(reservationDate) <= new Date()) {
       setError('reservation_date', { message: '今日以降の日付を選択してください' });
     } else {
       clearErrors('reservation_date');
     }
-  }, [clearErrors, reservationDate, setError]);
+
+    // すでに予約済みでないか確認する
+    if (facilityId) {
+      if (isReserved(Number(facilityId), new Date(reservationDate))) {
+        setError('reservation_date', { message: '予約が埋まっています' });
+      } else {
+        clearErrors('reservation_date');
+      }
+    }
+  }, [clearErrors, facilityId, isReserved, reservationDate, setError]);
 
   const onSubmit = (data: ReservationItem) => {
-    console.log(data);
+    const insertParams: ReservationInsertParams = {
+      facility_id: data.facility_id,
+      reservation_date: new Date(data.reservation_date),
+      remark: data.remark ?? null,
+      furniture_ids: data.furniture ?? [],
+    };
+    reserveFacility(insertParams);
+    alert('予約が完了しました');
+    reset();
   };
 
   return (
@@ -138,6 +161,7 @@ export default function ReservationForm() {
                 {...register('reservation_date', { required: '必須項目です' })}
                 className='w-full rounded-md border border-gray-400 p-2'
                 type='date'
+                defaultValue={defaultDate}
               />
             </div>
             <div className='mb-4'>
