@@ -8,7 +8,7 @@ export default function SignUp() {
         <p className='py-4 font-bold'>
           開発速度を優先してセキュリティの確認などをあまりしていないので、ダミーデータ以外は登録しないでください
         </p>
-        <SignUpForm signupSuccessRedirect='/reservation' />
+        <SignUpForm signupSuccessRedirect='/menu' />
       </div>
     </PageLayout>
   );

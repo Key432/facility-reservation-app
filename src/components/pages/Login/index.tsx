@@ -8,7 +8,7 @@ export default function Login() {
         <p>
           プレースホルダーのメアドとパスワードでログインできます。会員登録もできます。
         </p>
-        <LoginForm loginSuccessRedirect='/reservation' />
+        <LoginForm loginSuccessRedirect='/menu' />
       </div>
     </PageLayout>
   );
