@@ -5,6 +5,7 @@ next.config.js
 tailwind.config.js
 tsconfig.json
 postcss.config.js
+jest.config.ts
 
 # build dir
 build/
