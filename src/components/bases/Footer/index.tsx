@@ -14,7 +14,7 @@ export default function Footer() {
         </Link>
         <div className='text-sm'>
           <p>Developer: Shimizu</p>
-          <p>Deployed at 2024/03/06 ver1.0</p>
+          <p>Deployed at 2024/03/06 ver1.1</p>
         </div>
       </div>
     </footer>
