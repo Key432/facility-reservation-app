@@ -1,4 +1,3 @@
-import { notoSansJP } from '@/style/fonts';
 import Header from '../Header';
 import Footer from '../Footer';
 
@@ -10,14 +9,12 @@ export default function Layout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='ja' className='flex min-h-screen flex-col'>
-      <body className={`flex min-h-screen flex-col ${notoSansJP.variable}`}>
-        <Header />
-        <main className='flex flex-grow py-16'>
-          <div className='w-full'>{children}</div>
-        </main>
-        <Footer />
-      </body>
-    </html>
+    <>
+      <Header />
+      <main className='flex flex-grow py-16'>
+        <div className='w-full'>{children}</div>
+      </main>
+      <Footer />
+    </>
   );
 }

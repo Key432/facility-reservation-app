@@ -1,10 +1,4 @@
-// NOTE: onSubmitはユーザーの操作によって発火するイベントなのでサーバーサイドでは使えません。"use client"を指定します。
-// ちなみに、"use client"はReactの現行v18で実験的実装で、次期v19で正式実装予定のものをNext.jsが先んじて実装したものです。
-// そのためReactの時期バージョンアップでもしかすると仕様が変わるかもしれません。
 'use client';
-
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
-import { Database } from '@/lib/supabase/database.types';
 
 import Button from '@/components/ui/Button';
 import Link from 'next/link';
@@ -12,11 +6,7 @@ import Link from 'next/link';
 // https://react-hook-form.com/
 import { useForm } from 'react-hook-form';
 
-// NOTE:  クライアントコンポーネントでリダイレクトなどを行うためのHooksです。
-// ネットで検索すると同名の`useRouter`を`next/router`から読み込んでいるものがありますが、Page Routerのものです。
-import { useRouter } from 'next/navigation';
-
-export type LoginForm = {
+export type LoginData = {
   email: string;
   password: string;
 };
@@ -25,38 +15,16 @@ const emailPattern =
   /^[a-zA-Z0-9_.+-]+@([a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9]*\.)+[a-zA-Z]{2,}$/;
 
 export default function LoginForm({
-  loginSuccessRedirect = undefined,
+  onSubmit,
 }: {
   loginSuccessRedirect?: string;
+  onSubmit: (data: LoginData) => Promise<void>;
 }) {
-  // supabaseを操作するクライアントの作成
-  const supabase = createClientComponentClient<Database>();
-  const router = useRouter();
-
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginForm>();
-
-  // formのサブミットボタンを押下されるとhandleSbumitに渡したこのonSubmitが実行される。
-  // フォームのデータは引数としてわたってくる
-  const onSubmit = async ({ email, password }: LoginForm) => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      // propsで渡されたページに遷移する
-      if (loginSuccessRedirect) router.push(loginSuccessRedirect);
-    } catch (error) {
-      console.error(error);
-      alert('サインインに失敗しました');
-    }
-  };
+  } = useForm<LoginData>();
 
   /* 
     NOTE: Reactにおけるフォームの作り方はしっかり調べるとややこしいです。
@@ -67,7 +35,7 @@ export default function LoginForm({
     https://zenn.dev/tns_00/articles/react-controlled-and-uncontrolled
   */
   return (
-    <div className='rounded-lg border border-gray-400 p-8'>
+    <>
       {/*
         NOTE: `onSubmit={handleSubmit(onSubmit)}`では動かず、こうやって無名関数でラップしないとエラーになる。
         同事例報告あり：https://stackoverflow.com/questions/74190256/eslint-promise-returning-function-provided-to-attribute-where-a-void-return-was
@@ -79,22 +47,22 @@ export default function LoginForm({
             <label className='block' htmlFor='email'>
               メールアドレス*
               {/*
-              NOTE: JSXのなかでは{}で囲むことで式を書くことができます。変数などを表示させるときに{}で括るのはこのためです。
-              ここで`...register()`の`...`はスプレッド構文というものです。
-              https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Operators/Spread_syntax
-              
-              register()は引数でオブジェクトリテラルを返すのですが、そのkey-valueをタグ内に展開することができます。
-              例えば
-              ```
-                const props = {label: "test", color: "black"}
-                <Button {...props}/>
-              ```
-              と書くのは、
-              ```
-                <Button label="test" color="black"/>
-              ```
-              と書くのと同じことです。子コンポーネントにまとめてpropsを渡すとき便利です。
-            */}
+                NOTE: JSXのなかでは{}で囲むことで式を書くことができます。変数などを表示させるときに{}で括るのはこのためです。
+                ここで`...register()`の`...`はスプレッド構文というものです。
+                https://developer.mozilla.org/ja/docs/Web/JavaScript/Reference/Operators/Spread_syntax
+                
+                register()は引数でオブジェクトリテラルを返すのですが、そのkey-valueをタグ内に展開することができます。
+                例えば
+                ```
+                  const props = {label: "test", color: "black"}
+                  <Button {...props}/>
+                ```
+                と書くのは、
+                ```
+                  <Button label="test" color="black"/>
+                ```
+                と書くのと同じことです。子コンポーネントにまとめてpropsを渡すとき便利です。
+              */}
             </label>
             <input
               id='email'
@@ -133,6 +101,6 @@ export default function LoginForm({
           サインアップ
         </Link>
       </p>
-    </div>
+    </>
   );
 }
